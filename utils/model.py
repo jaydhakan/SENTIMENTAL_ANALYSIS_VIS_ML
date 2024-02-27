@@ -1,15 +1,18 @@
-import pandas as pd
+import time
+
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import ComplementNB
 
+from utils.logger import logger
 
-def label_your_texts(texts: list[str], test_size: float = 0.1):
-    # df = pd.read_csv('/home/jay/Downloads/df_file.csv')
-    #
-    # X = df['Text']
-    # y = df['Label']
+
+def label_your_texts(texts: list[str], test_size: float = 0.3):
+    start_time = time.perf_counter()
+    logger.info(
+        'Started using our trained model to generate labels for blogs.'
+    )
 
     newsgroups_data = fetch_20newsgroups(
         subset='all', shuffle=True, random_state=42
@@ -19,7 +22,7 @@ def label_your_texts(texts: list[str], test_size: float = 0.1):
     y = newsgroups_data.target
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42
+        X, y, test_size=test_size, random_state=42
     )
 
     vectorizer = CountVectorizer()
@@ -31,18 +34,25 @@ def label_your_texts(texts: list[str], test_size: float = 0.1):
 
     accuracy = model.score(X_test_vectorized, y_test)
 
-    print(f"Model with {accuracy * 100:.2f} % accuracy will be used.\n")
+    logger.debug(
+        f"Model with \u001b[32m{accuracy * 100:.2f} % \u001b[37m"
+        f"accuracy will be used."
+    )
 
     vectorized_texts = vectorizer.transform(texts)
     topic_names = newsgroups_data.target_names
-
-    return [
+    generated_labels = [
         topic_names[label] for label in model.predict(vectorized_texts)
     ]
+    logger.debug(
+        f'Successfully generated labels for blogs. Time Taken: \u001b[32m'
+        f'{(time.perf_counter() - start_time):.2f} seconds\u001b[37m.'
+    )
+    return generated_labels
 
 
 if __name__ == '__main__':
-    texts = ["""
+    test_texts = ["""
     My Fellow Americans,
 
     I stand before you today not to spew fancy political rhetoric or to talk 
@@ -70,4 +80,4 @@ if __name__ == '__main__':
 
     Vote John Smith for Town Council of District 40!
     """]
-    print(label_your_texts(texts=texts))
+    label_your_texts(texts=test_texts)

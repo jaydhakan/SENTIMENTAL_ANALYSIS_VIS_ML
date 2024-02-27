@@ -1,10 +1,5 @@
 import matplotlib.pyplot as plt
 
-_TRAIN_DOWNLOAD_URL = ("https://raw.githubusercontent.com/mhjabreel"
-                       "/CharCnn_Keras/master/data/ag_news_csv/train.csv")
-_TEST_DOWNLOAD_URL = ("https://raw.githubusercontent.com/mhjabreel"
-                      "/CharCnn_Keras/master/data/ag_news_csv/test.csv")
-
 
 def generate_visualisation(
     positive_scores: list, negative_scores: list, topic_names: list
@@ -20,11 +15,11 @@ def generate_visualisation(
         else:
             total_blogs_on_topic[topic] = 1
         total_positive_scores[topic] = int(
-            total_positive_scores.get(topic, 0) + positive_score
+            (total_positive_scores.get(topic, 0)) + positive_score
         )
 
         total_negative_scores[topic] = int(
-            total_negative_scores.get(topic, 0) + negative_score
+            (total_negative_scores.get(topic, 0)) + negative_score
         )
 
     topic_names = total_positive_scores.keys()
@@ -67,19 +62,17 @@ def generate_visualisation(
 
     ax.legend()
     plt.tight_layout()
-    # plt.show()
-    plt.savefig(fname='temp')
+    plt.savefig(fname='positive_negative_scores_by_topic')
 
 
 def generate_line_graph(positive_scores: list, negative_scores: list):
-    fig, ax = plt.subplots()
     x = range(1, len(positive_scores) + 1)
     plt.plot(x, positive_scores, color='green', label='Positive Words')
-    plt.plot(x, negative_scores, color='red', label='Negative Words')
+    plt.plot(x, negative_scores, color='#FF474C', label='Negative Words')
 
-    plt.xlabel('Data Points')
+    plt.xlabel('Blogs')
     plt.ylabel('Scores')
-    plt.title('Positive and Negative Scores')
+    plt.title('Blogs vs Positive and Negative Scores')
     plt.legend()
 
-    plt.savefig('tmep2')
+    plt.savefig('positive_negative_scores_by_urls')
