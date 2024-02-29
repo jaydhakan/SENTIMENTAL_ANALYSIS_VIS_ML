@@ -7,21 +7,19 @@ from utils.analysis_helpers import analysis_helper
 from utils.logger import logger
 from utils.model import label_your_texts
 from utils.visualisation_helpers import (
-    generate_line_graph, generate_visualisation
+    generate_complex_words_graph, generate_line_graph, generate_visualisation
 )
 
 
 def start_analysis(is_data_extracted: bool = False):
-    corrupted_url_ids = ['blackassign0036', 'blackassign0049']
     df = pd.read_excel('details/Input.xlsx')
-
     start_time = time.perf_counter()
     if not is_data_extracted:
         df = analysis_helper.write_responses_from_blogs_in_files(df)
 
+    corrupted_url_ids = ['36', '49']
     df = df[~df['URL_ID'].isin(corrupted_url_ids)]
-    url_ids = [url_id[11:] for url_id in df['URL_ID']]
-    df['URL_ID'] = url_ids
+
     sentences = analysis_helper.get_sentences()
 
     words_count, cleaned_words_count = (
@@ -80,7 +78,11 @@ def start_analysis(is_data_extracted: bool = False):
     logger.info('Generating visualisations using matplotlib library.')
     generate_line_graph(positive_score, negative_score)
     generate_visualisation(positive_score, negative_score, labels_for_texts)
-    logger.debug('Visualisations created for your better analysis.')
+    generate_complex_words_graph(
+        positive_score, negative_score, complex_words_counts
+    )
+
+    logger.debug('Visualisations created.')
 
     logger.info(
         f'Total time taken: '
@@ -89,10 +91,4 @@ def start_analysis(is_data_extracted: bool = False):
 
 
 if __name__ == '__main__':
-    start_analysis(is_data_extracted=True)
-
-'''
-effect of complex word on sentiment of blog
-complex word more, then positive score and negative score
-complex word less, then positive score and negative score
-'''
+    start_analysis(is_data_extracted=False)
